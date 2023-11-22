@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShuttleRun : MonoBehaviour
 {
 
-    public Transform[] Robot;
-    private Vector3 TempRobotPos;
+    public Vector3[] Robot;
+
+    public GameObject Robot_1;
+    public GameObject Robot_2;
+
     private Vector3 DefRobotPos;
     private bool forward;
 
@@ -24,30 +28,36 @@ public class ShuttleRun : MonoBehaviour
     {
         if (forward)
         {
-            
-            Robot[0].position = Vector3.MoveTowards(Robot[0].position, Robot[1].position, Time.deltaTime * 4);
-            Robot[0].LookAt(Robot[1].position);
-            if (Vector3.Distance(Robot[0].position, Robot[1].position) <= 0.5f)
+            Vector3 direction = Robot_2.transform.position - transform.position;
+            Quaternion rotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
+            transform.position += (Robot_2.transform.position - transform.position) * Time.deltaTime;
+
+            if (Vector3.Distance(Robot_1.transform.position, Robot_2.transform.position) <= 0.5f)
             {
                 forward = false;
             }
-            
+
         }
         if (!forward)
+        {
+            Vector3 direction = DefRobotPos - transform.position;
+            Quaternion rotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
+            transform.position += (DefRobotPos - transform.position) * Time.deltaTime;
+
+            if (Vector3.Distance(Robot_1.transform.position, DefRobotPos) <= 0.5f)
             {
-                Robot[0].position = Vector3.MoveTowards(Robot[0].position, DefRobotPos, Time.deltaTime * 4);
-                Robot[0].LookAt(DefRobotPos);
-                if (Vector3.Distance(Robot[0].position, DefRobotPos) <= 0.5f)
-                {
-                    SetDefaultVAlues();
-                }
+                forward = true;
             }
+        }
+
 
     }
 
     private void SetDefaultVAlues()
     {
         forward = true;
-       DefRobotPos.Set(0.00f, 1.33f, 5.28f);
+        DefRobotPos.Set(0.00f, 1.33f, 5.28f);
     }
 }
