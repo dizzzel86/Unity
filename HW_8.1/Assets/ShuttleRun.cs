@@ -5,59 +5,59 @@ using UnityEngine;
 
 public class ShuttleRun : MonoBehaviour
 {
-
-    public Vector3[] Robot;
-
-    public GameObject Robot_1;
-    public GameObject Robot_2;
-
-    private Vector3 DefRobotPos;
+    public Vector3[] points;
+    private float speed;
     private bool forward;
 
+    public GameObject Robot;
+
+    private int index;
 
     void Start()
     {
-        SetDefaultVAlues();
+        SetDefaultValues();
     }
     void Update()
     {
         Run();
     }
-
     private void Run()
     {
         if (forward)
         {
-            Vector3 direction = Robot_2.transform.position - transform.position;
-            Quaternion rotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
-            transform.position += (Robot_2.transform.position - transform.position) * Time.deltaTime;
-
-            if (Vector3.Distance(Robot_1.transform.position, Robot_2.transform.position) <= 0.5f)
+            if (index < points.Length - 1)
             {
-                forward = false;
+                Vector3 direction = points[index + 1] - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
+                transform.position = Vector3.MoveTowards(transform.position, points[index + 1], speed * Time.deltaTime);
+                if (Vector3.Distance(transform.position, points[index + 1]) <= 0.5f)
+                {
+                    forward = false;
+                    index++;
+                }
             }
-
         }
-        if (!forward)
+        else
         {
-            Vector3 direction = DefRobotPos - transform.position;
-            Quaternion rotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
-            transform.position += (DefRobotPos - transform.position) * Time.deltaTime;
-
-            if (Vector3.Distance(Robot_1.transform.position, DefRobotPos) <= 0.5f)
+            if (index == points.Length - 1)
             {
-                forward = true;
+                Vector3 direction = points[index - 1] - transform.position;
+                Quaternion rotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
+                transform.position = Vector3.MoveTowards(transform.position, points[index - 1], speed * Time.deltaTime);
+                if (Vector3.Distance(transform.position, points[index - 1]) <= 0.5f)
+                {
+                    forward = true;
+                    index--;
+                }
             }
         }
-
-
     }
-
-    private void SetDefaultVAlues()
+    private void SetDefaultValues()
     {
+        points[1].Set(0.00f, 0f, -10.26f);
+        speed = 5f;
         forward = true;
-        DefRobotPos.Set(0.00f, 1.33f, 5.28f);
     }
 }
