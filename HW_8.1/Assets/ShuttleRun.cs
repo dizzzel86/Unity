@@ -8,10 +8,7 @@ public class ShuttleRun : MonoBehaviour
     public Vector3[] points;
     private float speed;
     private bool forward;
-
-    public GameObject Robot;
-
-    private int index;
+    private int index = 0;
 
     void Start()
     {
@@ -27,36 +24,34 @@ public class ShuttleRun : MonoBehaviour
         {
             if (index < points.Length - 1)
             {
-                Vector3 direction = points[index + 1] - transform.position;
-                Quaternion rotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
                 transform.position = Vector3.MoveTowards(transform.position, points[index + 1], speed * Time.deltaTime);
+                transform.LookAt(points[index + 1]);
                 if (Vector3.Distance(transform.position, points[index + 1]) <= 0.5f)
                 {
-                    forward = false;
                     index++;
+                }
+                if (index == points.Length - 1)
+                {
+                    forward = false;
                 }
             }
         }
         else
         {
-            if (index == points.Length - 1)
+            transform.position = Vector3.MoveTowards(transform.position, points[index - 1], speed * Time.deltaTime);
+            transform.LookAt(points[index - 1]);
+            if (Vector3.Distance(transform.position, points[index - 1]) <= 0.5f)
             {
-                Vector3 direction = points[index - 1] - transform.position;
-                Quaternion rotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 8f);
-                transform.position = Vector3.MoveTowards(transform.position, points[index - 1], speed * Time.deltaTime);
-                if (Vector3.Distance(transform.position, points[index - 1]) <= 0.5f)
-                {
-                    forward = true;
-                    index--;
-                }
+                index--;
+            }
+            if (index == 0)
+            {
+                forward = true;
             }
         }
     }
     private void SetDefaultValues()
     {
-        points[1].Set(0.00f, 0f, -10.26f);
         speed = 5f;
         forward = true;
     }
